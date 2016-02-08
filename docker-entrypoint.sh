@@ -3,7 +3,7 @@
 tarball=false
 zipball=false
 
-OPT=`getopt -o "" -l "tarball" -- "$@"`
+OPT=`getopt -o "" -l "tarball,zipball" -- "$@"`
 set -- $OPT
 
 while [ $# -gt 0 ]; do
