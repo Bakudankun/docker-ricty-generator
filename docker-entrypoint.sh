@@ -9,6 +9,7 @@ set -- $OPT
 while [ $# -gt 0 ]; do
 	case $1 in
 		--tarball) tarball=true ;;
+		--zipball) zipball=true ;;
 	esac
 	shift
 done
@@ -27,11 +28,16 @@ fi
 
 if [ -e Ricty-Regular.ttf ]; then
 	if [ ! $tarball -a ! $zipball ]; then
-		cp Ricty*.ttf LICENSE README.md /out
-	elif [ $tarball ]; then
+		cp -r Ricty*.ttf LICENSE README.md /out
+	elif [ $tarball -o $zipball ]; then
 		outdir="Ricty-v${RICTY_VERSON}"
 		mkdir $outdir
-		cp Ricty*.ttf LICENSE README.md $outdir
-		tar -czf - $outdir
+		cp -r Ricty*.ttf LICENSE README.md $outdir
+		if [ $tarball ]; then
+			tar -czf - $outdir
+		elif [ $zipball ]; then
+			zip $outdir >/dev/null 2>&1
+			cat $outdir.zip
+		fi
 	fi
 fi
