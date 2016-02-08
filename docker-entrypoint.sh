@@ -8,5 +8,5 @@ if [ ! -e Ricty-Regular.ttf ]; then
 fi
 
 if [ -e Ricty-Regular.ttf ]; then
-	cp Ricty*.ttf LICENSE README.md /out
+	cp -r Ricty*.ttf LICENSE README.md /out
 fi
