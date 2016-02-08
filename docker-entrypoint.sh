@@ -1,8 +1,5 @@
 #!/bin/sh
 
-tarball=false
-zipball=false
-
 OPT=`getopt -o "" -l "tarball,zipball" -- "$@"`
 set -- $OPT
 
