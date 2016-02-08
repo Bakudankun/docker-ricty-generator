@@ -7,4 +7,6 @@ if [ ! -e Ricty-Regular.ttf ]; then
 	./misc/os2version_reviser.sh Ricty*.ttf
 fi
 
-mv Ricty*.ttf LICENSE README.md /out
+if [ -e Ricty-Regular.ttf ]; then
+	cp Ricty*.ttf LICENSE README.md /out
+fi
