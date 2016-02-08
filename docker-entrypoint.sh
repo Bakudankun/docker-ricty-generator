@@ -33,8 +33,7 @@ if [ -e Ricty-Regular.ttf ]; then
 		if [ "$tarball" ]; then
 			tar -czf - $outdir
 		elif [ "$zipball" ]; then
-			zip -r $outdir.zip $outdir >/dev/null 2>&1
-			cat $outdir.zip
+			zip -qr - $outdir
 		fi
 	fi
 fi
