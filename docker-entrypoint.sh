@@ -30,13 +30,13 @@ if [ -e Ricty-Regular.ttf ]; then
 	if [ ! $tarball -a ! $zipball ]; then
 		cp -r Ricty*.ttf LICENSE README.md /out
 	elif [ $tarball -o $zipball ]; then
-		outdir="Ricty-v${RICTY_VERSON}"
+		outdir="Ricty-v${RICTY_VERSION}"
 		mkdir $outdir
 		cp -r Ricty*.ttf LICENSE README.md $outdir
 		if [ $tarball ]; then
 			tar -czf - $outdir
 		elif [ $zipball ]; then
-			zip $outdir >/dev/null 2>&1
+			zip -r $outdir.zip $outdir >/dev/null 2>&1
 			cat $outdir.zip
 		fi
 	fi
