@@ -7,7 +7,7 @@ ENV MIGU_VERSION 20150712
 ENV MIGU_RELEASE_ID 63545
 
 RUN apt-get update \
-	&& apt-get install -y curl zip unzip fontforge \
+	&& apt-get install -y curl zip unzip fontforge-nox \
 	&& rm -rf /var/lib/apt/lists/*
 
 RUN curl -SL https://github.com/yascentur/Ricty/archive/${RICTY_VERSION}.tar.gz \
