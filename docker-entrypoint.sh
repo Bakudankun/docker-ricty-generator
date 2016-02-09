@@ -1,6 +1,6 @@
 #!/bin/sh
 
-show-usage() {
+show_usage() {
 	cat <<EOT
 Usage:
  docker run [--rm] -v /path/to/outdir:/out bakudankun/ricty-generator
@@ -11,7 +11,7 @@ EOT
 }
 
 OPT=`getopt -o "h" -l "tarball,zipball,help" -- "$@"`
-if [ $? != 0 ]; then show-usage; exit 1; fi
+if [ $? != 0 ]; then show_usage; exit 1; fi
 
 set -- $OPT
 
@@ -19,8 +19,8 @@ while [ $# -gt 0 ]; do
 	case $1 in
 		--tarball) tarball=true ;;
 		--zipball) zipball=true ;;
-		-h | --help) show-usage; exit 0 ;;
-		*) show-usage; exit 1 ;;
+		-h | --help) show_usage; exit 0 ;;
+		*) show_usage; exit 1 ;;
 	esac
 	shift
 done
