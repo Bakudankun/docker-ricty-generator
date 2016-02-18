@@ -10,7 +10,7 @@ Usage:
 EOT
 }
 
-OPT=`getopt -o "h" -l "tarball,zipball,help,generator-opts:" -- "$@"`
+OPT=`getopt -o "h" -l "tarball,zipball,help,generator-opts:,discord-opts:" -- "$@"`
 if [ $? != 0 ]; then show_usage; exit 1; fi
 
 set -- $OPT
@@ -20,6 +20,7 @@ while [ $# -gt 0 ]; do
 		--tarball) tarball=true; shift ;;
 		--zipball) zipball=true; shift ;;
 		--generator-opts) shift; generator_opts=$1; shift ;;
+		--discord-opts) shift; discord_opts=$1; shift ;;
 		-h | --help) show_usage; exit 0 ;;
 		--) shift; break ;;
 		*) show_usage; exit 1 ;;
@@ -39,6 +40,9 @@ if [ ! -e Ricty-Regular.ttf ]; then
 			echo 'Failed to generate Ricty. Exiting...' 1>&2
 			exit 1
 		fi
+		if [ "$discord_opts" ]; then
+			eval "./ricty_discord_converter.pe $discord_opts Ricty-Regular.ttf Ricty-Bold.ttf"
+		fi
 		echo 'Now revise fonts for OS/2 (it may takes a little time).'
 		./misc/os2version_reviser.sh Ricty*.ttf
 		if [ $? = 0 ]; then
@@ -55,6 +59,9 @@ if [ ! -e Ricty-Regular.ttf ]; then
 		if [ ! -e Ricty-Regular.ttf ]; then
 			echo 'Failed to generate Ricty. Exiting...' 1>&2
 			exit 1
+		fi
+		if [ "$discord_opts" ]; then
+			eval "./ricty_discord_converter.pe $discord_opts Ricty-Regular.ttf Ricty-Bold.ttf" >/dev/null 2>&1
 		fi
 		eval "./misc/os2version_reviser.sh Ricty*.ttf" >/dev/null 2>&1
 	fi
