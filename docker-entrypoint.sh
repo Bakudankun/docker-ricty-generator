@@ -10,7 +10,7 @@ Usage:
 EOT
 }
 
-OPT=`getopt -o "h" -l "tarball,zipball,help,generator-opts" -- "$@"`
+OPT=`getopt -o "h" -l "tarball,zipball,help,generator-opts:" -- "$@"`
 if [ $? != 0 ]; then show_usage; exit 1; fi
 
 set -- $OPT
