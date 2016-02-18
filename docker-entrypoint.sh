@@ -51,7 +51,7 @@ if [ ! -e Ricty-Regular.ttf ]; then
 			echo 'Failed to revise fonts. The output fonts may have wide spaces.'
 		fi
 	else
-		eval "./ricty_generator.sh $generator_opts auto" >/dev/null 2>&1
+		eval "./ricty_generator.sh $generator_opts auto" 1>&2
 		if [ $? != 0 ]; then
 			echo "ricty_generator.sh returned with error. Exiting..." 1>&2
 			exit 1
@@ -63,7 +63,8 @@ if [ ! -e Ricty-Regular.ttf ]; then
 		if [ "$discord_opts" ]; then
 			eval "fontforge ricty_discord_converter.pe $discord_opts Ricty-Regular.ttf Ricty-Bold.ttf" >/dev/null 2>&1
 		fi
-		eval "./misc/os2version_reviser.sh Ricty*.ttf" >/dev/null 2>&1
+		echo 'Now revise fonts for OS/2 (it may takes a little time).' 1>&2
+		./misc/os2version_reviser.sh Ricty*.ttf 1>&2
 	fi
 fi
 
