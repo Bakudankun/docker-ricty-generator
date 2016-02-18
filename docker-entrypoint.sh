@@ -13,7 +13,7 @@ EOT
 OPT=`getopt -o "h" -l "tarball,zipball,help,generator-opts:,discord-opts:" -- "$@"`
 if [ $? != 0 ]; then show_usage; exit 1; fi
 
-set -- $OPT
+eval set -- "$OPT"
 
 while [ $# -gt 0 ]; do
 	case $1 in
