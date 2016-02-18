@@ -17,12 +17,12 @@ set -- $OPT
 
 while [ $# -gt 0 ]; do
 	case $1 in
-		--tarball) tarball=true ;;
-		--zipball) zipball=true ;;
+		--tarball) tarball=true; shift ;;
+		--zipball) zipball=true; shift ;;
 		-h | --help) show_usage; exit 0 ;;
+		--) shift; break ;;
 		*) show_usage; exit 1 ;;
 	esac
-	shift
 done
 
 cd /Ricty-${RICTY_VERSION}
