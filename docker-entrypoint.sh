@@ -10,7 +10,7 @@ Usage:
 EOT
 }
 
-OPT=`getopt -o "h" -l "tarball,zipball,help" -- "$@"`
+OPT=`getopt -o "h" -l "tarball,zipball,help,generator-opts" -- "$@"`
 if [ $? != 0 ]; then show_usage; exit 1; fi
 
 set -- $OPT
@@ -19,6 +19,7 @@ while [ $# -gt 0 ]; do
 	case $1 in
 		--tarball) tarball=true; shift ;;
 		--zipball) zipball=true; shift ;;
+		--generator-opts) shift; generator_opts=$1; shift ;;
 		-h | --help) show_usage; exit 0 ;;
 		--) shift; break ;;
 		*) show_usage; exit 1 ;;
@@ -29,22 +30,34 @@ cd /Ricty-${RICTY_VERSION}
 
 if [ ! -e Ricty-Regular.ttf ]; then
 	if [ ! "$tarball" -a ! "$zipball" ]; then
-		./ricty_generator.sh auto
-			if [ ! -e Ricty-Regular.ttf ]; then
-				echo 'Failed to generate Ricty. exitting...'
-				exit 1;
+		eval "./ricty_generator.sh $generator_opts auto"
+		if [ $? != 0 ]; then
+			echo "ricty_generator.sh returned with error. Exiting..." 1>&2
+			exit 1
+		fi
+		if [ ! -e Ricty-Regular.ttf ]; then
+			echo 'Failed to generate Ricty. Exiting...' 1>&2
+			exit 1;
+		else
+			echo 'Now revise fonts for OS/2 (it may takes a little time).'
+			./misc/os2version_reviser.sh Ricty*.ttf
+			if [ $? = 0 ]; then
+				echo 'Complete!'
 			else
-				echo 'Now revise fonts for OS/2 (it may takes a little time).'
-				./misc/os2version_reviser.sh Ricty*.ttf
-				if [ $? = 0 ]; then
-					echo 'Complete!'
-				else
-					echo 'Failed to revise fonts. The output fonts may have wide spaces.'
-				fi
+				echo 'Failed to revise fonts. The output fonts may have wide spaces.'
 			fi
+		fi
 	else
-		./ricty_generator.sh auto >/dev/null 2>&1
-		./misc/os2version_reviser.sh Ricty*.ttf >/dev/null 2>&1
+		eval "./ricty_generator.sh $generator_opts auto" >/dev/null 2>&1
+		if [ $? != 0 ]; then
+			echo "ricty_generator.sh returned with error. Exiting..." 1>&2
+			exit 1
+		fi
+		if [ ! -e Ricty-Regular.ttf ]; then
+			echo 'Failed to generate Ricty. Exiting...' 1>&2
+			exit 1;
+		else
+		eval "./misc/os2version_reviser.sh Ricty*.ttf" >/dev/null 2>&1
 	fi
 fi
 
