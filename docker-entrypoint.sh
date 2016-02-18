@@ -37,15 +37,14 @@ if [ ! -e Ricty-Regular.ttf ]; then
 		fi
 		if [ ! -e Ricty-Regular.ttf ]; then
 			echo 'Failed to generate Ricty. Exiting...' 1>&2
-			exit 1;
+			exit 1
+		fi
+		echo 'Now revise fonts for OS/2 (it may takes a little time).'
+		./misc/os2version_reviser.sh Ricty*.ttf
+		if [ $? = 0 ]; then
+			echo 'Complete!'
 		else
-			echo 'Now revise fonts for OS/2 (it may takes a little time).'
-			./misc/os2version_reviser.sh Ricty*.ttf
-			if [ $? = 0 ]; then
-				echo 'Complete!'
-			else
-				echo 'Failed to revise fonts. The output fonts may have wide spaces.'
-			fi
+			echo 'Failed to revise fonts. The output fonts may have wide spaces.'
 		fi
 	else
 		eval "./ricty_generator.sh $generator_opts auto" >/dev/null 2>&1
@@ -55,8 +54,8 @@ if [ ! -e Ricty-Regular.ttf ]; then
 		fi
 		if [ ! -e Ricty-Regular.ttf ]; then
 			echo 'Failed to generate Ricty. Exiting...' 1>&2
-			exit 1;
-		else
+			exit 1
+		fi
 		eval "./misc/os2version_reviser.sh Ricty*.ttf" >/dev/null 2>&1
 	fi
 fi
