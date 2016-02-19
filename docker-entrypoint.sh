@@ -12,13 +12,14 @@ Options:
   --discord-opts=opts      Options for ricty_discord_converter.pe (read Ricty's README for detail)
   --generator-opts=opts    Options for ricty_generator.sh (read Ricty's README for detail)
   --oblique                Create oblique fonts
+  --no-os2                 Don't execute os2version_reviser.sh
   --tarball                Vomit .tar.gz archive of generated fonts to stdout
   -h, --help               Show usage
   --zipball                Vomit .zip archive of generated fonts to stdout
 EOT
 }
 
-OPT=`getopt -o "oh" -l "tarball,zipball,help,oblique,generator-opts:,discord-opts:" -- "$@"`
+OPT=`getopt -o "oh" -l "tarball,zipball,help,oblique,no-os2,generator-opts:,discord-opts:" -- "$@"`
 if [ $? != 0 ]; then show_usage; exit 1; fi
 
 eval set -- "$OPT"
@@ -30,6 +31,7 @@ while [ $# -gt 0 ]; do
 		--generator-opts) shift; generator_opts=$1; shift ;;
 		--discord-opts) shift; discord_opts=$1; shift ;;
 		-o | --oblique) oblique=true; shift ;;
+		--no-os2) no_os2=true; shift ;;
 		-h | --help) show_usage; exit 0 ;;
 		--) shift; break ;;
 		*) show_usage; exit 1 ;;
@@ -69,12 +71,14 @@ if [ $? != 0 ]; then
 			fi
 			echo 'Done.' 1>&2
 		fi
-		echo 'Now revise fonts for OS/2 (it may takes a little time).' 1>&2
-		./misc/os2version_reviser.sh Ricty*.ttf
-		if [ $? = 0 ]; then
-			echo 'Done.' 1>&2
-		else
-			echo 'Failed to revise fonts. The output fonts may have wide spaces.' 1>&2
+		if [ ! "$no_os2" ]; then
+			echo 'Now revise fonts for OS/2 (it may takes a little time).' 1>&2
+			./misc/os2version_reviser.sh Ricty*.ttf
+			if [ $? = 0 ]; then
+				echo 'Done.' 1>&2
+			else
+				echo 'Failed to revise fonts. The output fonts may have wide spaces.' 1>&2
+			fi
 		fi
 	else
 		eval "./ricty_generator.sh $generator_opts auto" 1>&2
@@ -105,12 +109,14 @@ if [ $? != 0 ]; then
 			fi
 			echo 'Done.' 1>&2
 		fi
-		echo 'Now revise fonts for OS/2 (it may takes a little time).' 1>&2
-		./misc/os2version_reviser.sh Ricty*.ttf 1>&2
-		if [ $? = 0 ]; then
-			echo 'Done.' 1>&2
-		else
-			echo 'Failed to revise fonts. The output fonts may have wide spaces.' 1>&2
+		if [ ! "$no_os2" ]; then
+			echo 'Now revise fonts for OS/2 (it may takes a little time).' 1>&2
+			./misc/os2version_reviser.sh Ricty*.ttf 1>&2
+			if [ $? = 0 ]; then
+				echo 'Done.' 1>&2
+			else
+				echo 'Failed to revise fonts. The output fonts may have wide spaces.' 1>&2
+			fi
 		fi
 	fi
 fi
