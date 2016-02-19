@@ -53,7 +53,7 @@ if [ $? != 0 ]; then
 		fi
 		if [ "$discord_opts" ]; then
 			echo 'Generate specified RictyDiscord fonts.' 1>&2
-			eval "fontforge ricty_discord_converter.pe $discord_opts Ricty-Regular.ttf Ricty-Bold.ttf"
+			eval "fontforge ricty_discord_converter.pe $discord_opts Ricty*.ttf"
 			if [ $? != 0 ]; then
 				echo 'ricty_discord_converter.pe returned an error. Exiting...' 1>&2
 				exit 1
@@ -89,7 +89,7 @@ if [ $? != 0 ]; then
 		fi
 		if [ "$discord_opts" ]; then
 			echo 'Generate specified RictyDiscord fonts.' 1>&2
-			eval "fontforge ricty_discord_converter.pe $discord_opts Ricty-Regular.ttf Ricty-Bold.ttf" 1>&2
+			eval "fontforge ricty_discord_converter.pe $discord_opts Ricty*.ttf" 1>&2
 			if [ $? != 0 ]; then
 				echo 'ricty_discord_converter.pe returned an error. Exiting...' 1>&2
 				exit 1
