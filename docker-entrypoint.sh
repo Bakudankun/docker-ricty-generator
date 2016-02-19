@@ -42,81 +42,41 @@ cd /Ricty-${RICTY_VERSION}
 
 ls Ricty*.ttf >/dev/null 2>&1
 if [ $? != 0 ]; then
-	if [ ! "$tarball" -a ! "$zipball" ]; then
-		eval "./ricty_generator.sh $generator_opts auto"
+	eval "./ricty_generator.sh $generator_opts auto" 1>&2
+	if [ $? != 0 ]; then
+		echo 'ricty_generator.sh returned an error. Exiting...' 1>&2
+		exit 1
+	fi
+	ls Ricty*.ttf >/dev/null 2>&1
+	if [ $? != 0 ]; then
+		echo 'Failed to generate Ricty. Exiting...' 1>&2
+		exit 1
+	fi
+	if [ "$discord_opts" ]; then
+		echo 'Generate specified RictyDiscord fonts.' 1>&2
+		eval "fontforge ricty_discord_converter.pe $discord_opts Ricty*.ttf" 1>&2
 		if [ $? != 0 ]; then
-			echo 'ricty_generator.sh returned an error. Exiting...' 1>&2
+			echo 'ricty_discord_converter.pe returned an error. Exiting...' 1>&2
 			exit 1
 		fi
-		ls Ricty*.ttf >/dev/null 2>&1
+		echo 'Done.' 1>&2
+	fi
+	if [ "$oblique" ]; then
+		echo 'Create oblique fonts.' 1>&2
+		fontforge ./misc/regular2oblique_converter.pe Ricty*.ttf 1>&2
 		if [ $? != 0 ]; then
-			echo 'Failed to generate Ricty. Exiting...' 1>&2
+			echo 'regular2oblique_converter.pe returned an error. Exiting...' 1>&2
 			exit 1
 		fi
-		if [ "$discord_opts" ]; then
-			echo 'Generate specified RictyDiscord fonts.' 1>&2
-			eval "fontforge ricty_discord_converter.pe $discord_opts Ricty*.ttf"
-			if [ $? != 0 ]; then
-				echo 'ricty_discord_converter.pe returned an error. Exiting...' 1>&2
-				exit 1
-			fi
+		echo 'Done.' 1>&2
+	fi
+	if [ ! "$no_os2" ]; then
+		echo 'Now revise fonts for OS/2 (it may takes a little time).' 1>&2
+		./misc/os2version_reviser.sh Ricty*.ttf 1>&2
+		if [ $? = 0 ]; then
 			echo 'Done.' 1>&2
-		fi
-		if [ "$oblique" ]; then
-			echo 'Create oblique fonts.' 1>&2
-			fontforge ./misc/regular2oblique_converter.pe Ricty*.ttf
-			if [ $? != 0 ]; then
-				echo 'regular2oblique_converter.pe returned an error. Exiting...' 1>&2
-				exit 1
-			fi
-			echo 'Done.' 1>&2
-		fi
-		if [ ! "$no_os2" ]; then
-			echo 'Now revise fonts for OS/2 (it may takes a little time).' 1>&2
-			./misc/os2version_reviser.sh Ricty*.ttf
-			if [ $? = 0 ]; then
-				echo 'Done.' 1>&2
-			else
-				echo 'Failed to revise fonts. The output fonts may have wide spaces.' 1>&2
-			fi
-		fi
-	else
-		eval "./ricty_generator.sh $generator_opts auto" 1>&2
-		if [ $? != 0 ]; then
-			echo 'ricty_generator.sh returned an error. Exiting...' 1>&2
-			exit 1
-		fi
-		ls Ricty*.ttf >/dev/null 2>&1
-		if [ $? != 0 ]; then
-			echo 'Failed to generate Ricty. Exiting...' 1>&2
-			exit 1
-		fi
-		if [ "$discord_opts" ]; then
-			echo 'Generate specified RictyDiscord fonts.' 1>&2
-			eval "fontforge ricty_discord_converter.pe $discord_opts Ricty*.ttf" 1>&2
-			if [ $? != 0 ]; then
-				echo 'ricty_discord_converter.pe returned an error. Exiting...' 1>&2
-				exit 1
-			fi
-			echo 'Done.' 1>&2
-		fi
-		if [ "$oblique" ]; then
-			echo 'Create oblique fonts.' 1>&2
-			fontforge ./misc/regular2oblique_converter.pe Ricty*.ttf 1>&2
-			if [ $? != 0 ]; then
-				echo 'regular2oblique_converter.pe returned an error. Exiting...' 1>&2
-				exit 1
-			fi
-			echo 'Done.' 1>&2
-		fi
-		if [ ! "$no_os2" ]; then
-			echo 'Now revise fonts for OS/2 (it may takes a little time).' 1>&2
-			./misc/os2version_reviser.sh Ricty*.ttf 1>&2
-			if [ $? = 0 ]; then
-				echo 'Done.' 1>&2
-			else
-				echo 'Failed to revise fonts. The output fonts may have wide spaces.' 1>&2
-			fi
+		else
+			echo 'Failed to revise fonts. The output fonts may have wide spaces.' 1>&2
 		fi
 	fi
 fi
