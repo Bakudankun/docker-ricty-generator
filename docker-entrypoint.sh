@@ -68,7 +68,7 @@ if [ ! -e Ricty-Regular.ttf ]; then
 			exit 1
 		fi
 		if [ "$discord_opts" ]; then
-			eval "fontforge ricty_discord_converter.pe $discord_opts Ricty-Regular.ttf Ricty-Bold.ttf" >/dev/null 2>&1
+			eval "fontforge ricty_discord_converter.pe $discord_opts Ricty-Regular.ttf Ricty-Bold.ttf" 1>&2
 		fi
 		echo 'Now revise fonts for OS/2 (it may takes a little time).' 1>&2
 		./misc/os2version_reviser.sh Ricty*.ttf 1>&2
