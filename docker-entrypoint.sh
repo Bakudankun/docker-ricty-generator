@@ -54,6 +54,7 @@ if [ $? != 0 ]; then
 	fi
 	if [ "$discord_opts" ]; then
 		echo 'Generate specified RictyDiscord fonts.' 1>&2
+		rm Ricty*Discord*.ttf >/dev/null 2>&1
 		eval "fontforge ricty_discord_converter.pe $discord_opts Ricty*.ttf" 1>&2
 		if [ $? != 0 ]; then
 			echo 'ricty_discord_converter.pe returned an error. Exiting...' 1>&2
