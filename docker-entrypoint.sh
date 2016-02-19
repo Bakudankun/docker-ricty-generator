@@ -2,11 +2,18 @@
 
 show_usage() {
 	cat <<EOT
-Usage:
- docker run [--rm] -v /path/to/outdir:/out bakudankun/ricty-generator
- docker run [--rm] bakudankun/ricty-generator --tarball > Ricty.tar.gz
- docker run [--rm] bakudankun/ricty-generator --zipball > Ricty.zip
- docker run [--rm] bakudankun/ricty-generator [-h|--help]
+Usage: docker run [--rm] -v /path/to/outdir:/out bakudankun/ricty-generator [OPTIONS]
+       docker run [--rm] bakudankun/ricty-generator --tarball [OPTIONS] > Ricty.tar.gz
+       docker run [--rm] bakudankun/ricty-generator --zipball [OPTIONS] > Ricty.zip
+       docker run [--rm] bakudankun/ricty-generator [ -h | --help ]
+
+Options:
+
+  --discord-opts=opts      Options for ricty_discord_converter.pe (read Ricty's README for detail)
+  --generator-opts=opts    Options for ricty_generator.sh (read Ricty's README for detail)
+  --tarball                Vomit .tar.gz archive of generated fonts to stdout
+  -h, --help               Show usage
+  --zipball                Vomit .zip archive of generated fonts to stdout
 EOT
 }
 
