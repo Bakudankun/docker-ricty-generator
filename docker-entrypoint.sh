@@ -11,6 +11,7 @@ Options:
 
   --discord-opts=opts      Options for ricty_discord_converter.pe (read Ricty's README for detail)
   --generator-opts=opts    Options for ricty_generator.sh (read Ricty's README for detail)
+  --oblique                Create oblique fonts
   --tarball                Vomit .tar.gz archive of generated fonts to stdout
   -h, --help               Show usage
   --zipball                Vomit .zip archive of generated fonts to stdout
