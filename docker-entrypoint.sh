@@ -112,7 +112,7 @@ if [ ! "$no_os2" ]; then
 	for i in Ricty*.ttf
 	do
 		if [ ! -f $i.bak ]; then
-			pre_revise+=($i)
+			pre_revise+=("$i")
 		fi
 	done
 
