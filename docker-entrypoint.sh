@@ -1,11 +1,13 @@
 #!/bin/sh
 
 show_usage() {
-	cat <<EOT
+	cat 1>&2 <<EOT
 Usage: docker run [--rm] -v /path/to/outdir:/out bakudankun/ricty-generator [OPTIONS]
        docker run [--rm] bakudankun/ricty-generator --tarball [OPTIONS] > Ricty.tar.gz
        docker run [--rm] bakudankun/ricty-generator --zipball [OPTIONS] > Ricty.zip
        docker run [--rm] bakudankun/ricty-generator [ -h | --help ]
+
+A nice guy which generate Ricty fonts automatically.
 
 Options:
 
@@ -24,10 +26,11 @@ if [ $? != 0 ]; then show_usage; exit 1; fi
 
 eval set -- "$OPT"
 
-while [ $# -gt 0 ]; do
+while [ $# -gt 0 ]
+do
 	case $1 in
-		--tarball) tarball=true; shift ;;
-		--zipball) zipball=true; shift ;;
+		--tarball) tarball=true; zipball=; shift ;;
+		--zipball) zipball=true; tarball=; shift ;;
 		--generator-opts) shift; generator_opts=$1; shift ;;
 		--discord-opts) shift; discord_opts=$1; shift ;;
 		-o | --oblique) oblique=true; shift ;;
@@ -37,6 +40,7 @@ while [ $# -gt 0 ]; do
 		*) show_usage; exit 1 ;;
 	esac
 done
+if [ ! ( "$tarball" -o "$zipball" -o -d /out ) ]; then show_usage; exit 1; fi
 
 cd /Ricty-${RICTY_VERSION}
 
@@ -52,28 +56,43 @@ if [ $? != 0 ]; then
 		echo 'Failed to generate Ricty. Exiting...' 1>&2
 		exit 1
 	fi
-	if [ "$discord_opts" ]; then
-		echo 'Generate specified RictyDiscord fonts.' 1>&2
-		rm Ricty*Discord*.ttf >/dev/null 2>&1
-		eval "fontforge ricty_discord_converter.pe $discord_opts Ricty*.ttf" 1>&2
-		if [ $? != 0 ]; then
-			echo 'ricty_discord_converter.pe returned an error. Exiting...' 1>&2
-			exit 1
-		fi
-		echo 'Done.' 1>&2
+fi
+
+# Now Ricty*.ttf must be exist.
+
+ls Ricty*Discord-*.ttf >/dev/null 2>&1
+if [ $? != 0 -a "$discord_opts" ]; then
+	echo 'Generate specified RictyDiscord fonts.' 1>&2
+	rm Ricty*Discord*.ttf >/dev/null 2>&1
+	eval "fontforge ricty_discord_converter.pe $discord_opts Ricty*.ttf" 1>&2
+	if [ $? != 0 ]; then
+		echo 'ricty_discord_converter.pe returned an error. Exiting...' 1>&2
+		exit 1
 	fi
-	if [ "$oblique" ]; then
-		echo 'Create oblique fonts.' 1>&2
-		fontforge ./misc/regular2oblique_converter.pe Ricty*.ttf 1>&2
-		if [ $? != 0 ]; then
-			echo 'regular2oblique_converter.pe returned an error. Exiting...' 1>&2
-			exit 1
-		fi
-		echo 'Done.' 1>&2
+	echo 'Done.' 1>&2
+fi
+
+ls Ricty*Oblique.ttf >/dev/null 2>&1
+if [ $? != 0 -a "$oblique" ]; then
+	echo 'Create oblique fonts.' 1>&2
+	fontforge ./misc/regular2oblique_converter.pe Ricty*.ttf 1>&2
+	if [ $? != 0 ]; then
+		echo 'regular2oblique_converter.pe returned an error. Exiting...' 1>&2
+		exit 1
 	fi
-	if [ ! "$no_os2" ]; then
+	echo 'Done.' 1>&2
+fi
+
+if [ ! "$no_os2" ]; then
+	for i in Ricty*.ttf
+	do
+		if [ ! -f $i.bak ]; then
+			preos2+=($i)
+		fi
+	done
+	if [ "$prerevise" ]; then
 		echo 'Now revise fonts for OS/2 (it may takes a little time).' 1>&2
-		./misc/os2version_reviser.sh Ricty*.ttf 1>&2
+		./misc/os2version_reviser.sh ${prerevise[@]} 1>&2
 		if [ $? = 0 ]; then
 			echo 'Done.' 1>&2
 		else
@@ -83,19 +102,25 @@ if [ $? != 0 ]; then
 fi
 
 if ls Ricty*.ttf >/dev/null 2>&1; then
-	if [ ! "$tarball" -a ! "$zipball" ]; then
+	if [ -d /out ]; then
 		cp -r Ricty*.ttf LICENSE README.md /out
-		echo 'Copied font files. Check the output dir.'
-	elif [ "$tarball" -o "$zipball" ]; then
+		echo 'Copied the font files. Check the output dir.' 1>&2
+	fi
+	
+	if [ "$tarball" -o "$zipball" ]; then
 		outdir="Ricty-v${RICTY_VERSION}"
 		mkdir $outdir
 		cp -r Ricty*.ttf LICENSE README.md $outdir
 		if [ "$tarball" ]; then
+			echo 'Now vomit the .tar.gz archive to stdout.' 1>&2
 			tar -czf - $outdir
 		elif [ "$zipball" ]; then
+			echo 'Now vomit the .zip archive to stdout.' 1>&2
 			zip -qr - $outdir
 		fi
+		echo 'Done. Check the redirected file.' 1>&2
 	fi
 else
-	echo 'What happened?' 1>&2
+	echo 'Huh? What happened?' 1>&2
+	exit 1
 fi
