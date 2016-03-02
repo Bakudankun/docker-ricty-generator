@@ -47,7 +47,7 @@ done
 
 # Exit if no output method is set.
 
-if [ ! ( "$tarball" -o "$zipball" -o -d /out ) ]; then show_usage; exit 1; fi
+if [ ! \( "$tarball" -o "$zipball" -o -d /out \) ]; then show_usage; exit 1; fi
 
 
 cd /Ricty-${RICTY_VERSION}
