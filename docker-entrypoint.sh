@@ -112,19 +112,18 @@ if [ ! "$no_os2" ]; then
 	for i in Ricty*.ttf
 	do
 		if [ ! -f $i.bak ]; then
-			pre_revise+=("$i")
+			echo 'Now revise fonts for OS/2 (it may takes a little time).' 1>&2
+
+			# It doesn't matter if there are already revised fonts.
+			./misc/os2version_reviser.sh Ricty*.ttf 1>&2
+			if [ $? = 0 ]; then
+				echo 'Done.' 1>&2
+			else
+				echo 'Failed to revise fonts. The output fonts may have wide spaces.' 1>&2
+			fi
+			break
 		fi
 	done
-
-	if [ "$pre_revise" ]; then
-		echo 'Now revise fonts for OS/2 (it may takes a little time).' 1>&2
-		./misc/os2version_reviser.sh ${pre_revise[@]} 1>&2
-		if [ $? = 0 ]; then
-			echo 'Done.' 1>&2
-		else
-			echo 'Failed to revise fonts. The output fonts may have wide spaces.' 1>&2
-		fi
-	fi
 fi
 
 
