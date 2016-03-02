@@ -21,6 +21,9 @@ Options:
 EOT
 }
 
+
+# Parse options.
+
 OPT=`getopt -o "oh" -l "tarball,zipball,help,oblique,no-os2,generator-opts:,discord-opts:" -- "$@"`
 if [ $? != 0 ]; then show_usage; exit 1; fi
 
@@ -40,9 +43,17 @@ do
 		*) show_usage; exit 1 ;;
 	esac
 done
+
+
+# Exit if no output method is set.
+
 if [ ! ( "$tarball" -o "$zipball" -o -d /out ) ]; then show_usage; exit 1; fi
 
+
 cd /Ricty-${RICTY_VERSION}
+
+
+# Generate Ricty fonts if not exist.
 
 ls Ricty*.ttf >/dev/null 2>&1
 if [ $? != 0 ]; then
@@ -60,6 +71,9 @@ fi
 
 # Now Ricty*.ttf must be exist.
 
+
+# Generate Discord fonts if --discord-opts is specified and not already exists.
+
 ls Ricty*Discord-*.ttf >/dev/null 2>&1
 if [ $? != 0 -a "$discord_opts" ]; then
 	echo 'Generate specified RictyDiscord fonts.' 1>&2
@@ -72,6 +86,9 @@ if [ $? != 0 -a "$discord_opts" ]; then
 	echo 'Done.' 1>&2
 fi
 
+
+# Generate oblique fonts if --oblique is specified and not already exists.
+
 ls Ricty*Oblique.ttf >/dev/null 2>&1
 if [ $? != 0 -a "$oblique" ]; then
 	echo 'Create oblique fonts.' 1>&2
@@ -82,6 +99,9 @@ if [ $? != 0 -a "$oblique" ]; then
 	fi
 	echo 'Done.' 1>&2
 fi
+
+
+# Run os2version_reviser.sh for Windows if --no-os2 isn't set.
 
 if [ ! "$no_os2" ]; then
 	for i in Ricty*.ttf
@@ -100,6 +120,9 @@ if [ ! "$no_os2" ]; then
 		fi
 	fi
 fi
+
+
+# Output the generated fonts.
 
 if ls Ricty*.ttf >/dev/null 2>&1; then
 	if [ -d /out ]; then
