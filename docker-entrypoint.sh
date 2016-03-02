@@ -62,28 +62,31 @@ if [ $? != 0 ]; then
 		echo 'ricty_generator.sh returned an error. Exiting...' 1>&2
 		exit 1
 	fi
-	ls Ricty*.ttf >/dev/null 2>&1
-	if [ $? != 0 ]; then
-		echo 'Failed to generate Ricty. Exiting...' 1>&2
-		exit 1
-	fi
+fi
+
+
+ls Ricty*.ttf >/dev/null 2>&1
+if [ $? != 0 ]; then
+	echo 'Failed to generate Ricty. Exiting...' 1>&2
+	exit 1
 fi
 
 # Now Ricty*.ttf must be exist.
 
 
-# Generate Discord fonts if --discord-opts is specified and not already exists.
+# Generate Discord fonts if --discord-opts is specified.
+# It would already exists because ricty_generator.sh creates automatically.
 
-ls Ricty*Discord-*.ttf >/dev/null 2>&1
-if [ $? != 0 -a "$discord_opts" ]; then
+if [ "$discord_opts" ]; then
 	echo 'Generate specified RictyDiscord fonts.' 1>&2
 	rm Ricty*Discord*.ttf >/dev/null 2>&1
 	eval "fontforge ricty_discord_converter.pe $discord_opts Ricty*.ttf" 1>&2
 	if [ $? != 0 ]; then
 		echo 'ricty_discord_converter.pe returned an error. Exiting...' 1>&2
 		exit 1
+	else
+		echo 'Done.' 1>&2
 	fi
-	echo 'Done.' 1>&2
 fi
 
 
@@ -96,23 +99,26 @@ if [ $? != 0 -a "$oblique" ]; then
 	if [ $? != 0 ]; then
 		echo 'regular2oblique_converter.pe returned an error. Exiting...' 1>&2
 		exit 1
+	else
+		echo 'Done.' 1>&2
 	fi
-	echo 'Done.' 1>&2
 fi
 
 
 # Run os2version_reviser.sh for Windows if --no-os2 isn't set.
 
 if [ ! "$no_os2" ]; then
+	# Check if it is already revised by searching backup file.
 	for i in Ricty*.ttf
 	do
 		if [ ! -f $i.bak ]; then
-			preos2+=($i)
+			pre_revise+=($i)
 		fi
 	done
-	if [ "$prerevise" ]; then
+
+	if [ "$pre_revise" ]; then
 		echo 'Now revise fonts for OS/2 (it may takes a little time).' 1>&2
-		./misc/os2version_reviser.sh ${prerevise[@]} 1>&2
+		./misc/os2version_reviser.sh ${pre_revise[@]} 1>&2
 		if [ $? = 0 ]; then
 			echo 'Done.' 1>&2
 		else
