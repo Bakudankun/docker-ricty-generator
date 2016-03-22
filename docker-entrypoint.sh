@@ -11,14 +11,18 @@ A nice guy which generate Ricty fonts automatically.
 
 Options:
 
-  --discord-opts=opts      Options for ricty_discord_converter.pe (read Ricty's README for detail)
-  --generator-opts=opts    Options for ricty_generator.sh (read Ricty's README for detail)
+  --tarball                Vomit .tar.gz archive of generated fonts to stdout
+  --zipball                Vomit .zip archive of generated fonts to stdout
+  --generator-opts=opts    Options for ricty_generator.sh (see below)
+  --discord-opts=opts      Options for ricty_discord_converter.pe (see below)
   -o, --oblique            Create oblique fonts
   --no-os2                 Don't execute os2version_reviser.sh
-  --tarball                Vomit .tar.gz archive of generated fonts to stdout
-  -h, --help               Show usage
-  --zipball                Vomit .zip archive of generated fonts to stdout
+  -h, --help               Show this usage and exit
+
 EOT
+	./ricty_generator.sh -h | awk 'start==1 {print} $1=="Options:" {print "Options for ricty_generator.sh:"; start=1}' 1>&2
+	echo 1>&2
+	fontforge ricty_discord_converter.pe 2>&1 | awk 'start==1 {print} $1=="Options:" {print "Options for ricty_discord_converter.pe:"; start=1}' 1>&2
 }
 
 
@@ -47,7 +51,11 @@ done
 
 # Exit if no output method is set.
 
-if [ ! \( "$tarball" -o "$zipball" -o -d /out \) ]; then show_usage; exit 1; fi
+if [ ! \( "$tarball" -o "$zipball" -o -d /out \) ]; then
+	echo "Error: No output method specified."
+	show_usage;
+	exit 1;
+fi
 
 
 cd /Ricty-${RICTY_VERSION}
