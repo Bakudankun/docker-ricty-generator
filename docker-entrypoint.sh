@@ -7,7 +7,7 @@ Usage: docker run [--rm] -v /path/to/outdir:/out bakudankun/ricty-generator [OPT
        docker run [--rm] bakudankun/ricty-generator --zipball [OPTIONS] > Ricty.zip
        docker run [--rm] bakudankun/ricty-generator [ -h | --help ]
 
-A nice guy which generate Ricty fonts automatically.
+A nice guy which generates Ricty fonts automatically.
 
 Options:
 
@@ -52,7 +52,7 @@ done
 # Exit if no output method is set.
 
 if [ ! \( "$tarball" -o "$zipball" -o -d /out \) ]; then
-	echo "Error: No output method specified."
+	echo "Error: No output method specified." 1>&2
 	show_usage;
 	exit 1;
 fi
