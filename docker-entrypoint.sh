@@ -20,9 +20,9 @@ Options:
   -h, --help               Show this usage and exit
 
 EOT
-	./ricty_generator.sh -h | awk 'start==1 {print} $1=="Options:" {print "Options for ricty_generator.sh:"; start=1}' 1>&2
+	./Ricty-${RICTY_VERSION}/ricty_generator.sh -h | awk 'start==1 {print} $1=="Options:" {print "Options for ricty_generator.sh:"; start=1}' 1>&2
 	echo 1>&2
-	fontforge ricty_discord_converter.pe 2>&1 | awk 'start==1 {print} $1=="Options:" {print "Options for ricty_discord_converter.pe:"; start=1}' 1>&2
+	fontforge ./Ricty-${RICTY_VERSION}/ricty_discord_converter.pe 2>&1 | awk 'start==1 {print} $1=="Options:" {print "Options for ricty_discord_converter.pe:"; start=1}' 1>&2
 }
 
 
