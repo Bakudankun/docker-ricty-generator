@@ -9,7 +9,7 @@ RUN apt-get update \
 	&& apt-get install -y software-properties-common \
 	&& add-apt-repository ppa:fontforge/fontforge \
 	&& apt-get update \
-	&& apt-get install -y curl zip unzip fontforge fonttools \
+	&& apt-get install -y curl zip unzip fontforge-nox fonttools \
 	&& rm -rf /var/lib/apt/lists/*
 
 WORKDIR /Ricty

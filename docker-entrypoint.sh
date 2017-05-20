@@ -107,7 +107,7 @@ if [ ! "$no_os2" ]; then
 fi
 
 
-# Output the generated fonts.
+# Output generated fonts.
 
 if ls Ricty*.ttf >/dev/null 2>&1; then
 	if [ -d /out ]; then
@@ -120,10 +120,10 @@ if ls Ricty*.ttf >/dev/null 2>&1; then
 		mkdir $outdir 1>&2
 		cp -r Ricty*.ttf LICENSE $outdir 1>&2
 		if [ "$tarball" ]; then
-			echo 'Now vomit the .tar.gz archive to stdout.' 1>&2
+			echo 'Now vomit .tar.gz archive to stdout.' 1>&2
 			tar -czf - $outdir
 		elif [ "$zipball" ]; then
-			echo 'Now vomit the .zip archive to stdout.' 1>&2
+			echo 'Now vomit .zip archive to stdout.' 1>&2
 			zip -qr - $outdir
 		fi
 		echo 'Done. Check the redirected file.' 1>&2
