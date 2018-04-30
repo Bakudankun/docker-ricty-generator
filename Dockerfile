@@ -1,14 +1,11 @@
 FROM ubuntu:latest
 
 ENV RICTY_URL http://www.rs.tus.ac.jp/yyusa/ricty
-ENV RICTY_VERSION 4.1.0
+ENV RICTY_VERSION 4.1.1
 ENV MIGU_VERSION 20150712
 ENV MIGU_RELEASE_ID 63545
 
 RUN apt-get update \
-	&& apt-get install -y software-properties-common \
-	&& add-apt-repository ppa:fontforge/fontforge \
-	&& apt-get update \
 	&& apt-get install -y curl zip unzip fontforge-nox fonttools \
 	&& rm -rf /var/lib/apt/lists/*
 
@@ -16,7 +13,6 @@ WORKDIR /Ricty
 
 RUN mkdir -p LICENSE LICENSE/Migu LICENSE/Inconsolata \
 	&& curl -o ricty_generator.sh -SL ${RICTY_URL}/ricty_generator-${RICTY_VERSION}.sh \
-	&& curl -o regular2oblique_converter.pe -SL ${RICTY_URL}/regular2oblique_converter.pe \
 	&& chmod +x *.sh \
 	&& curl -o migu.zip -SL http://osdn.jp/frs/redir.php?f=%2Fmix-mplus-ipa%2F${MIGU_RELEASE_ID}%2Fmigu-1m-${MIGU_VERSION}.zip \
 	&& unzip migu.zip && rm migu.zip \

@@ -14,7 +14,6 @@ Options:
   --tarball                Vomit .tar.gz archive of generated fonts to stdout
   --zipball                Vomit .zip archive of generated fonts to stdout
   --generator-opts=opts    Options for ricty_generator.sh (see below)
-  -o, --oblique            Create oblique fonts
   --no-os2                 Don't fix font width on Windows
   -h, --help               Show this usage and exit
 
@@ -26,7 +25,7 @@ EOT
 
 # Parse options.
 
-OPT=`getopt -o "oh" -l "tarball,zipball,help,oblique,no-os2,generator-opts:" -- "$@"`
+OPT=`getopt -o "h" -l "tarball,zipball,help,no-os2,generator-opts:" -- "$@"`
 if [ $? != 0 ]; then show_usage; exit 1; fi
 
 eval set -- "$OPT"
@@ -37,7 +36,6 @@ do
 		--tarball) tarball=true; zipball=; shift ;;
 		--zipball) zipball=true; tarball=; shift ;;
 		--generator-opts) shift; generator_opts=$1; shift ;;
-		-o | --oblique) oblique=true; shift ;;
 		--no-os2) no_os2=true; shift ;;
 		-h | --help) show_usage; exit 0 ;;
 		--) shift; break ;;
@@ -76,22 +74,8 @@ fi
 # Now Ricty*.ttf must be exist.
 
 
-# Generate oblique fonts if --oblique is specified and not already exists.
-
-ls Ricty*Oblique.ttf >/dev/null 2>&1
-if [ $? != 0 -a "$oblique" ]; then
-	echo 'Create oblique fonts.' 1>&2
-	fontforge ./regular2oblique_converter.pe Ricty*.ttf 1>&2
-	if [ $? != 0 ]; then
-		echo 'regular2oblique_converter.pe returned an error. Exiting...' 1>&2
-		exit 1
-	else
-		echo 'Done.' 1>&2
-	fi
-fi
-
-
 # Fix font width for Windows unless --no-os2 is set.
+# cf. http://itouhiro.hatenablog.com/entry/20140910/font
 
 if [ ! "$no_os2" ]; then
 	echo 'Fix font width for Windows.' 1>&2
@@ -132,3 +116,5 @@ else
 	echo 'Huh? What happened?' 1>&2
 	exit 1
 fi
+
+# vim: set ts=4 sw=4 noet:
