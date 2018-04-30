@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 
 show_usage() {
 	cat 1>&2 <<EOT
@@ -14,21 +14,18 @@ Options:
   --tarball                Vomit .tar.gz archive of generated fonts to stdout
   --zipball                Vomit .zip archive of generated fonts to stdout
   --generator-opts=opts    Options for ricty_generator.sh (see below)
-  --discord-opts=opts      Options for ricty_discord_converter.pe (see below)
-  -o, --oblique            Create oblique fonts
-  --no-os2                 Don't execute os2version_reviser.sh
+  --no-os2                 Don't fix font width on Windows
   -h, --help               Show this usage and exit
 
 EOT
-	./Ricty-${RICTY_VERSION}/ricty_generator.sh -h | awk 'start==1 {print} $1=="Options:" {print "Options for ricty_generator.sh:"; start=1}' 1>&2
+	./ricty_generator.sh -h | awk 'start==1 {print} $1=="Options:" {print "Options for ricty_generator.sh:"; start=1}' 1>&2
 	echo 1>&2
-	fontforge ./Ricty-${RICTY_VERSION}/ricty_discord_converter.pe 2>&1 | awk 'start==1 {print} $1=="Options:" {print "Options for ricty_discord_converter.pe:"; start=1}' 1>&2
 }
 
 
 # Parse options.
 
-OPT=`getopt -o "oh" -l "tarball,zipball,help,oblique,no-os2,generator-opts:,discord-opts:" -- "$@"`
+OPT=`getopt -o "h" -l "tarball,zipball,help,no-os2,generator-opts:" -- "$@"`
 if [ $? != 0 ]; then show_usage; exit 1; fi
 
 eval set -- "$OPT"
@@ -39,8 +36,6 @@ do
 		--tarball) tarball=true; zipball=; shift ;;
 		--zipball) zipball=true; tarball=; shift ;;
 		--generator-opts) shift; generator_opts=$1; shift ;;
-		--discord-opts) shift; discord_opts=$1; shift ;;
-		-o | --oblique) oblique=true; shift ;;
 		--no-os2) no_os2=true; shift ;;
 		-h | --help) show_usage; exit 0 ;;
 		--) shift; break ;;
@@ -56,9 +51,6 @@ if [ ! \( "$tarball" -o "$zipball" -o -d /out \) ]; then
 	show_usage;
 	exit 1;
 fi
-
-
-cd /Ricty-${RICTY_VERSION}
 
 
 # Generate Ricty fonts if not exist.
@@ -82,76 +74,40 @@ fi
 # Now Ricty*.ttf must be exist.
 
 
-# Generate Discord fonts if --discord-opts is specified.
-# It would already exists because ricty_generator.sh creates automatically.
-
-if [ "$discord_opts" ]; then
-	echo 'Generate specified RictyDiscord fonts.' 1>&2
-	rm Ricty*Discord*.ttf >/dev/null 2>&1
-	eval "fontforge ricty_discord_converter.pe $discord_opts Ricty*.ttf" 1>&2
-	if [ $? != 0 ]; then
-		echo 'ricty_discord_converter.pe returned an error. Exiting...' 1>&2
-		exit 1
-	else
-		echo 'Done.' 1>&2
-	fi
-fi
-
-
-# Generate oblique fonts if --oblique is specified and not already exists.
-
-ls Ricty*Oblique.ttf >/dev/null 2>&1
-if [ $? != 0 -a "$oblique" ]; then
-	echo 'Create oblique fonts.' 1>&2
-	fontforge ./misc/regular2oblique_converter.pe Ricty*.ttf 1>&2
-	if [ $? != 0 ]; then
-		echo 'regular2oblique_converter.pe returned an error. Exiting...' 1>&2
-		exit 1
-	else
-		echo 'Done.' 1>&2
-	fi
-fi
-
-
-# Run os2version_reviser.sh for Windows if --no-os2 isn't set.
+# Fix font width for Windows unless --no-os2 is set.
+# cf. http://itouhiro.hatenablog.com/entry/20140910/font
 
 if [ ! "$no_os2" ]; then
-	# Check if it is already revised by searching backup file.
+	echo 'Fix font width for Windows.' 1>&2
 	for i in Ricty*.ttf
 	do
-		if [ ! -f $i.bak ]; then
-			echo 'Now revise fonts for OS/2 (it may takes a little time).' 1>&2
-
-			# It doesn't matter if there are already revised fonts.
-			./misc/os2version_reviser.sh Ricty*.ttf 1>&2
-			if [ $? = 0 ]; then
-				echo 'Done.' 1>&2
-			else
-				echo 'Failed to revise fonts. The output fonts may have wide spaces.' 1>&2
-			fi
-			break
-		fi
+		ttx -t OS/2 $i 1>&2
+		# xAvgCharWidth of Inconsolata and Migu 1M is 500.
+		sed -i -e "s/xAvgCharWidth value=\".*\"/xAvgCharWidth value=\"500\"/" ${i%.*}.ttx 1>&2
+		mv $i $i.bak
+		ttx -m $i.bak ${i%.*}.ttx 1>&2
+		rm ${i%.*}.ttx
 	done
 fi
 
 
-# Output the generated fonts.
+# Output generated fonts.
 
 if ls Ricty*.ttf >/dev/null 2>&1; then
 	if [ -d /out ]; then
-		cp -r Ricty*.ttf LICENSE README.md /out
-		echo 'Copied the font files. Check the output dir.' 1>&2
+		cp -r Ricty*.ttf LICENSE /out 1>&2
+		echo 'Copied font files. Check the output dir.' 1>&2
 	fi
 	
 	if [ "$tarball" -o "$zipball" ]; then
 		outdir="Ricty-v${RICTY_VERSION}"
-		mkdir $outdir
-		cp -r Ricty*.ttf LICENSE README.md $outdir
+		mkdir $outdir 1>&2
+		cp -r Ricty*.ttf LICENSE $outdir 1>&2
 		if [ "$tarball" ]; then
-			echo 'Now vomit the .tar.gz archive to stdout.' 1>&2
+			echo 'Now vomit .tar.gz archive to stdout.' 1>&2
 			tar -czf - $outdir
 		elif [ "$zipball" ]; then
-			echo 'Now vomit the .zip archive to stdout.' 1>&2
+			echo 'Now vomit .zip archive to stdout.' 1>&2
 			zip -qr - $outdir
 		fi
 		echo 'Done. Check the redirected file.' 1>&2
@@ -160,3 +116,5 @@ else
 	echo 'Huh? What happened?' 1>&2
 	exit 1
 fi
+
+# vim: set ts=4 sw=4 noet:
